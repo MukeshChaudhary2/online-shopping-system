@@ -43,10 +43,35 @@ public class DBConnectionUtil {
                         }
 
                         HikariConfig config = new HikariConfig();
-                        config.setDriverClassName(props.getProperty("db.driver", "com.mysql.cj.jdbc.Driver"));
-                        config.setJdbcUrl(props.getProperty("db.url", "jdbc:mysql://localhost:3306/shopping_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8"));
-                        config.setUsername(props.getProperty("db.username", "root"));
-                        config.setPassword(props.getProperty("db.password", "root"));
+
+                        // Check Railway environment variables first (Cloud deployment)
+                        String host = System.getenv("MYSQLHOST");
+                        String port = System.getenv("MYSQLPORT");
+                        String dbName = System.getenv("MYSQLDATABASE");
+                        String user = System.getenv("MYSQLUSER");
+                        String password = System.getenv("MYSQLPASSWORD");
+
+                        if (host != null && !host.isEmpty()) {
+                            if (port == null || port.isEmpty()) port = "3306";
+                            if (dbName == null || dbName.isEmpty()) dbName = "railway";
+                            if (user == null || user.isEmpty()) user = "root";
+
+                            String jdbcUrl = String.format("jdbc:mysql://%s:%s/%s?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8", 
+                                host, port, dbName);
+
+                            config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+                            config.setJdbcUrl(jdbcUrl);
+                            config.setUsername(user);
+                            config.setPassword(password != null ? password : "");
+                            LOGGER.info("Using Railway environment variables for database connection.");
+                        } else {
+                            // Fallback to db.properties for local development
+                            config.setDriverClassName(props.getProperty("db.driver", "com.mysql.cj.jdbc.Driver"));
+                            config.setJdbcUrl(props.getProperty("db.url", "jdbc:mysql://localhost:3306/shopping_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8"));
+                            config.setUsername(props.getProperty("db.username", "root"));
+                            config.setPassword(props.getProperty("db.password", "root"));
+                            LOGGER.info("Using db.properties configuration for local connection.");
+                        }
 
                         // Connection Pool configurations
                         config.setMaximumPoolSize(Integer.parseInt(props.getProperty("hikaricp.maximumPoolSize", "15")));
@@ -66,7 +91,7 @@ public class DBConnectionUtil {
                         LOGGER.info("HikariCP connection pool initialized successfully.");
                     } catch (Exception e) {
                         LOGGER.log(Level.SEVERE, "Failed to connect to MySQL database: " + e.getMessage(), e);
-                        throw new SQLException("Unable to connect to database. Please ensure MySQL is running and password in db.properties is correct: " + e.getMessage(), e);
+                        throw new SQLException("Unable to connect to database. Please ensure MySQL is running and password is correct: " + e.getMessage(), e);
                     }
                 }
             }
