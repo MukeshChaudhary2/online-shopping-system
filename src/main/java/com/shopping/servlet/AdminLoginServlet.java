@@ -52,6 +52,8 @@ public class AdminLoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+    	System.out.println("TEST HASH FOR Admin@123: " + PasswordUtil.hashPassword("Admin@123"));
+    	
         if (!CSRFUtil.isValidToken(request)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid or missing CSRF token.");
             return;
