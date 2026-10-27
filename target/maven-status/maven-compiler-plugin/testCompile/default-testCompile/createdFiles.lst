@@ -1,9 +1,0 @@
-com\shopping\ImageGeneratorTest.class
-com\shopping\DatabaseConnectionTest.class
-com\shopping\DatabaseSetupRunner.class
-com\shopping\VerifySampleDataHashesTest.class
-com\shopping\FullSystemEndToEndTest.class
-com\shopping\HashGeneratorTest.class
-com\shopping\TestLiveUserRegistrationTest.class
-com\shopping\ValidationAndDAOTest.class
-com\shopping\InspectUsersTableTest.class
