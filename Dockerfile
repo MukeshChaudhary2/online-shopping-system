@@ -22,9 +22,6 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 # Copy built WAR as ROOT.war (Serves application on root URL "/")
 COPY --from=builder /build/target/online-shopping-system.war /usr/local/tomcat/webapps/ROOT.war
 
-# Create uploads directory and set permissions
-RUN mkdir -p /usr/local/tomcat/webapps/ROOT/uploads && chmod -R 777 /usr/local/tomcat/webapps/
-
 # Expose standard Tomcat port and Render default port
 EXPOSE 8080 10000
 
